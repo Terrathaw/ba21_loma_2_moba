@@ -1,13 +1,14 @@
 package ch.zhaw.ch.dsp.phase;
 
-import android.util.Log;
-
 import java.util.Arrays;
 
 import ch.zhaw.ch.dsp.ComplexFrame;
 import ch.zhaw.ch.util.ArrayUtil;
 import ch.zhaw.ch.util.DSPUtil;
 
+/***
+ * Based on DAFX Chapter 7.3.5 Phase unwrapping http://dafx.de/DAFX_Book_Page/index.html
+ */
 public class BasicPhaseShifter extends PhaseReseter implements PhaseShifter {
 
     private float[] omegaConsts;
@@ -36,27 +37,26 @@ public class BasicPhaseShifter extends PhaseReseter implements PhaseShifter {
         float[] currentPhase = frame.getPhase();
         phaseDelta = ArrayUtil.sub(currentPhase, lastPhase);
         lastPhase = currentPhase;
-        MidRange midRange = defaultMidRange;
+        resetCurrentMidRange();
 
-        boolean transientDetected = transientDetection.getTransientMode() != TransientDetectionType.NONE && transientDetection.hasTransient(frame.getMagnitude());
+        boolean transientDetected = transientDetection.getTransientMode() != TransientDetectionType.NONE && transientDetection.detectTransients(frame.getMagnitude());
 
         if(transientDetected) {
-            Log.v("aaa", "transient detected");
-            midRange = resetPhase(currentPhase);
+            resetPhase(currentPhase);
         }
 
         if (!transientDetected || phaseResetType == PhaseResetType.BAND_LIMITED) {
             if(phaseResetType == PhaseResetType.BAND_LIMITED) {
                 phaseTransformedTemp = calculate(
-                        Arrays.copyOfRange(phaseTransformed, midRange.min, midRange.max),
-                        Arrays.copyOfRange(phaseDelta, midRange.min, midRange.max),
-                        Arrays.copyOfRange(omegaConsts, midRange.min, midRange.max)
+                        Arrays.copyOfRange(phaseTransformed, currentMidRange[0], currentMidRange[1]),
+                        Arrays.copyOfRange(phaseDelta, currentMidRange[0], currentMidRange[1]),
+                        Arrays.copyOfRange(omegaConsts, currentMidRange[0], currentMidRange[1])
                 );
             }else {
                 phaseTransformedTemp = calculate(phaseTransformed, phaseDelta, omegaConsts);
             }
             for(int i = 0; i < phaseTransformedTemp.length; i++){
-                phaseTransformed[midRange.min+i] = phaseTransformedTemp[i];
+                phaseTransformed[currentMidRange[0]+i] = phaseTransformedTemp[i];
             }
         }
 

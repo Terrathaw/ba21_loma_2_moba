@@ -4,6 +4,11 @@ import java.nio.BufferOverflowException;
 
 import ch.zhaw.ch.util.ArrayUtil;
 
+/***
+ * This class prevents the garbage collector and instancing from dropping the realtime performance
+ * of our app, by storing frame data into reusable buffers.
+ */
+
 public class FrameBuffer {
 
     private float[] buffer;
@@ -11,12 +16,24 @@ public class FrameBuffer {
     private int readIndex;
     private int writeIndex;
 
+    /***
+     * Constucts a frame buffer with the given parameters.
+     * @param bufferSize
+     * @param writeIndex
+     */
     public FrameBuffer(int bufferSize, int writeIndex) {
         this.bufferSize = bufferSize;
         this.buffer = ArrayUtil.rangeOfValue(bufferSize, (float) 0);
         this.writeIndex = writeIndex;
     }
 
+    /***
+     * Writes a frame into the buffer. also Provides functionalities for OLA
+     * @param writeBuffer
+     * @param length
+     * @param stepSize
+     * @param overlapAdd
+     */
     public void write(float[] writeBuffer, int length, int stepSize, boolean overlapAdd) {
         if (Math.signum(writeIndex + length) < 0) writeIndex = getWrappedWriteIndex(writeIndex);
 
@@ -29,6 +46,13 @@ public class FrameBuffer {
         writeIndex += stepSize;
     }
 
+    /***
+     * Reads data from the buffer. Adds functionality to clear a buffer by setting the clear boolean.
+     * @param length
+     * @param stepSize
+     * @param clear
+     * @return
+     */
     public float[] read(int length, int stepSize, boolean clear) {
         if (Math.signum(readIndex + length) < 0) readIndex = getWrappedWriteIndex(readIndex);
         float[] readBuffer = new float[length];
@@ -49,16 +73,24 @@ public class FrameBuffer {
         return readBuffer;
     }
 
+    /***
+     * Returns the current size of the readable buffer part
+     * @return
+     */
     public int size() {
         return writeIndex - readIndex;
     }
 
+    /***
+     * throws a buffer overflow.
+     * @param writeIndex
+     * @param readIndex
+     */
     private void throwOnOverflow(int writeIndex, int readIndex) {
         if (writeIndex - readIndex == bufferSize || writeIndex < readIndex) {
             throw new BufferOverflowException();
         }
     }
-
 
     private int getWrappedWriteIndex(int index) {
         return index % bufferSize;

@@ -4,6 +4,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/***
+ * Extended enumerator for transient detection, that provides functionalities for listing and identifying
+ * selections on the GUI.
+ */
 public enum TransientDetectionType {
     COMPOUND(0, "compound", "COMPOUND"),
     NONE(1, "none", "NONE"),
@@ -12,34 +16,67 @@ public enum TransientDetectionType {
 
     private int index;
     private String displayName;
-    private String className;
+    private String identifier;
 
+    /***
+     * Get all values hold in this enumerator
+     * @return enum list
+     */
     public static List<TransientDetectionType> getValues() {
         return Arrays.stream(values()).collect(Collectors.toList());
     }
 
-    public static TransientDetectionType getValue(String className) {
-        return Arrays.stream(values()).filter(p -> p.className.equals(className)).findFirst().orElseThrow(() -> new IllegalArgumentException(String.format("no phase shifter module of the name %s exists", className)));
-    }
-    public static TransientDetectionType getValue(int className) {
-        return Arrays.stream(values()).filter(p -> p.index == className).findFirst().orElseThrow(() -> new IllegalArgumentException(String.format("no phase shifter module of the name %s exists", className)));
+    /***
+     * Search for an specific TransientDetectionType by its string identifier
+     * @param identifier
+     * @return a single TransientDetectionType
+     */
+    public static TransientDetectionType getValue(String identifier) {
+        return Arrays.stream(values()).filter(p -> p.identifier.equals(identifier)).findFirst().orElseThrow(() -> new IllegalArgumentException(String.format("no phase shifter module of the name %s exists", identifier)));
     }
 
-    private TransientDetectionType(int index, String displayName, String className){
+    /***
+     * Search for an specific TransientDetectionType by its index in the list
+     * @param index
+     * @return a single TransientDetectionType
+     */
+    public static TransientDetectionType getValue(int index) {
+        return Arrays.stream(values()).filter(p -> p.index == index).findFirst().orElseThrow(() -> new IllegalArgumentException(String.format("no phase shifter module of the name %s exists", index)));
+    }
+
+    /***
+     * Enum constructor
+     * @param index
+     * @param displayName
+     * @param identifier
+     */
+    TransientDetectionType(int index, String displayName, String identifier){
         this.index = index;
         this.displayName = displayName;
-        this.className = className;
+        this.identifier = identifier;
     }
 
+    /***
+     * Returns the index number of the currently hold TransientDetectionType
+     * @return
+     */
     public int getIndex() {
         return index;
     }
 
+    /***
+     * Returns the displayName string of the currently hold TransientDetectionType
+     * @return
+     */
     public String getDisplayName() {
         return displayName;
     }
 
-    public String getClassName() {
-        return className;
+    /***
+     * Returns the identifier string of the currently hold TransientDetectionType
+     * @return
+     */
+    public String getIdentifier() {
+        return identifier;
     }
 }

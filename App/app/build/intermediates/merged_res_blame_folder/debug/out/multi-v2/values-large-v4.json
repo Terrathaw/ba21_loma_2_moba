@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-large-v4\\values-large-v4.xml",
+            "outputFile": "D:\\git-workspaces\\temp2\\App\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-large-v4\\values-large-v4.xml",
             "map": [
                 {
                     "source": "C:\\Users\\simon\\.gradle\\caches\\transforms-2\\files-2.1\\8ad8269c0a879b235a19dc8e7219d938\\material-1.1.0\\res\\values-large-v4\\values-large-v4.xml",

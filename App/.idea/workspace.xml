@@ -29,19 +29,17 @@
       <path>
         <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
         <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
-        <item name="BRANCH:dev" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="BRANCH:main" type="e8cecc67:BranchNodeDescriptor" />
       </path>
     </select>
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a92d1ab0-a00c-490f-9c74-2f52417e7a9f" name="Default Changelist" comment="scaled and dynamic phase locking updated and renamed">
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/ch/zhaw/ch/dsp/phase/BasicPhaseShifter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/ch/zhaw/ch/dsp/phase/BasicPhaseShifter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/ch/zhaw/ch/dsp/phase/DynamicPhaseLockedShifter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/ch/zhaw/ch/dsp/phase/DynamicPhaseLockedShifter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/ch/zhaw/ch/dsp/phase/ScaledPhaseLockedShifter.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/ch/zhaw/ch/dsp/phase/ScaledPhaseLockedShifter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/ch/zhaw/ch/dsp/phase/TransientDetection.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/ch/zhaw/ch/dsp/phase/TransientDetection.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/test/java/ch/zhaw/ch/TestBench.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/test/java/ch/zhaw/ch/dsp/phase/BasicPhaseShifterTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/test/java/ch/zhaw/ch/util/DSPUtilTest.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Default_Changelist.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Default_Changelist.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Default_Changelist1.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Default_Changelist1.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_08_06_2021_16_19__Default_Changelist_.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_08_06_2021_16_19__Default_Changelist_.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/temp.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/shelf/temp.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Audio_Signal_Processing_Toolbox-master.zip" beforeDir="false" />
     </list>
     <list id="7e806cd6-9dd6-4660-944a-b54eaeb16a5c" name="temp" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -153,7 +151,7 @@
       <command value="gradle app:build" />
     </option>
   </component>
-  <component name="RunManager" selected="Android App.app">
+  <component name="RunManager" selected="Android JUnit.java in Audio_Shifter.app">
     <configuration name="DSPUtilTest.princargFullLoad_isCorrect" type="AndroidJUnit" factoryName="Android JUnit" nameIsGenerated="true">
       <module name="Audio_Shifter.app" />
       <extension name="coverage">
@@ -702,7 +700,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="dev" />
+                        <option value="main" />
                       </list>
                     </value>
                   </entry>

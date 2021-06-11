@@ -1,102 +1,102 @@
 [
     {
-        "merged": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\build\\intermediates\\res\\merged\\debug\\layout_activity_player_view.xml.flat",
-        "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\layout\\activity_player_view.xml"
+        "merged": "D:\\git-workspaces\\temp2\\App\\app\\build\\intermediates\\res\\merged\\debug\\layout_activity_settings.xml.flat",
+        "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\layout\\activity_settings.xml"
     },
     {
-        "merged": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\build\\intermediates\\res\\merged\\debug\\raw_midi_percussive.wav.flat",
-        "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\raw\\midi_percussive.wav"
+        "merged": "D:\\git-workspaces\\temp2\\App\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-hdpi_ic_launcher_round.png.flat",
+        "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\mipmap-hdpi\\ic_launcher_round.png"
     },
     {
-        "merged": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\build\\intermediates\\res\\merged\\debug\\layout_song.xml.flat",
-        "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\layout\\song.xml"
+        "merged": "D:\\git-workspaces\\temp2\\App\\app\\build\\intermediates\\res\\merged\\debug\\layout_song.xml.flat",
+        "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\layout\\song.xml"
     },
     {
-        "merged": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\build\\intermediates\\res\\merged\\debug\\drawable-v24_ic_launcher_foreground.xml.flat",
-        "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\drawable-v24\\ic_launcher_foreground.xml"
+        "merged": "D:\\git-workspaces\\temp2\\App\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\mipmap-anydpi-v26\\ic_launcher.xml"
     },
     {
-        "merged": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-mdpi_ic_launcher.png.flat",
-        "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\mipmap-mdpi\\ic_launcher.png"
+        "merged": "D:\\git-workspaces\\temp2\\App\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-hdpi_ic_launcher.png.flat",
+        "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\mipmap-hdpi\\ic_launcher.png"
     },
     {
-        "merged": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-mdpi_ic_launcher_round.png.flat",
-        "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\mipmap-mdpi\\ic_launcher_round.png"
+        "merged": "D:\\git-workspaces\\temp2\\App\\app\\build\\intermediates\\res\\merged\\debug\\layout_activity_list_view.xml.flat",
+        "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\layout\\activity_list_view.xml"
     },
     {
-        "merged": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\build\\intermediates\\res\\merged\\debug\\layout_activity_list_view.xml.flat",
-        "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\layout\\activity_list_view.xml"
+        "merged": "D:\\git-workspaces\\temp2\\App\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-xhdpi_ic_launcher.png.flat",
+        "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\mipmap-xhdpi\\ic_launcher.png"
     },
     {
-        "merged": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-anydpi-v26_ic_launcher_round.xml.flat",
-        "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\mipmap-anydpi-v26\\ic_launcher_round.xml"
+        "merged": "D:\\git-workspaces\\temp2\\App\\app\\build\\intermediates\\res\\merged\\debug\\drawable_ic_launcher_background.xml.flat",
+        "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\drawable\\ic_launcher_background.xml"
     },
     {
-        "merged": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-xhdpi_ic_launcher.png.flat",
-        "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\mipmap-xhdpi\\ic_launcher.png"
+        "merged": "D:\\git-workspaces\\temp2\\App\\app\\build\\intermediates\\res\\merged\\debug\\raw_midi_percussive.wav.flat",
+        "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\raw\\midi_percussive.wav"
     },
     {
-        "merged": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-hdpi_ic_launcher_round.png.flat",
-        "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\mipmap-hdpi\\ic_launcher_round.png"
+        "merged": "D:\\git-workspaces\\temp2\\App\\app\\build\\intermediates\\res\\merged\\debug\\layout_activity_splash_screen.xml.flat",
+        "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\layout\\activity_splash_screen.xml"
     },
     {
-        "merged": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-xhdpi_ic_launcher_round.png.flat",
-        "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\mipmap-xhdpi\\ic_launcher_round.png"
+        "merged": "D:\\git-workspaces\\temp2\\App\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-mdpi_ic_launcher_round.png.flat",
+        "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\mipmap-mdpi\\ic_launcher_round.png"
     },
     {
-        "merged": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\build\\intermediates\\res\\merged\\debug\\layout_activity_settings.xml.flat",
-        "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\layout\\activity_settings.xml"
+        "merged": "D:\\git-workspaces\\temp2\\App\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-xhdpi_ic_launcher_round.png.flat",
+        "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\mipmap-xhdpi\\ic_launcher_round.png"
     },
     {
-        "merged": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-xxxhdpi_ic_launcher_round.png.flat",
-        "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\mipmap-xxxhdpi\\ic_launcher_round.png"
+        "merged": "D:\\git-workspaces\\temp2\\App\\app\\build\\intermediates\\res\\merged\\debug\\layout_menu.xml.flat",
+        "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\layout\\menu.xml"
     },
     {
-        "merged": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\build\\intermediates\\res\\merged\\debug\\raw_midi_mixed.wav.flat",
-        "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\raw\\midi_mixed.wav"
+        "merged": "D:\\git-workspaces\\temp2\\App\\app\\build\\intermediates\\res\\merged\\debug\\drawable-v24_ic_launcher_foreground.xml.flat",
+        "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\drawable-v24\\ic_launcher_foreground.xml"
     },
     {
-        "merged": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\build\\intermediates\\res\\merged\\debug\\layout_activity_splash_screen.xml.flat",
-        "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\layout\\activity_splash_screen.xml"
+        "merged": "D:\\git-workspaces\\temp2\\App\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-xxhdpi_ic_launcher.png.flat",
+        "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\mipmap-xxhdpi\\ic_launcher.png"
     },
     {
-        "merged": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-anydpi-v26_ic_launcher.xml.flat",
-        "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\mipmap-anydpi-v26\\ic_launcher.xml"
+        "merged": "D:\\git-workspaces\\temp2\\App\\app\\build\\intermediates\\res\\merged\\debug\\raw_midi_mixed.wav.flat",
+        "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\raw\\midi_mixed.wav"
     },
     {
-        "merged": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-hdpi_ic_launcher.png.flat",
-        "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\mipmap-hdpi\\ic_launcher.png"
+        "merged": "D:\\git-workspaces\\temp2\\App\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-xxxhdpi_ic_launcher_round.png.flat",
+        "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\mipmap-xxxhdpi\\ic_launcher_round.png"
     },
     {
-        "merged": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\build\\intermediates\\res\\merged\\debug\\layout_options.xml.flat",
-        "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\layout\\options.xml"
+        "merged": "D:\\git-workspaces\\temp2\\App\\app\\build\\intermediates\\res\\merged\\debug\\menu_main.xml.flat",
+        "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\menu\\main.xml"
     },
     {
-        "merged": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\build\\intermediates\\res\\merged\\debug\\raw_midi_melodic.wav.flat",
-        "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\raw\\midi_melodic.wav"
+        "merged": "D:\\git-workspaces\\temp2\\App\\app\\build\\intermediates\\res\\merged\\debug\\layout_activity_player_view.xml.flat",
+        "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\layout\\activity_player_view.xml"
     },
     {
-        "merged": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\build\\intermediates\\res\\merged\\debug\\layout_menu.xml.flat",
-        "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\layout\\menu.xml"
+        "merged": "D:\\git-workspaces\\temp2\\App\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-mdpi_ic_launcher.png.flat",
+        "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\mipmap-mdpi\\ic_launcher.png"
     },
     {
-        "merged": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\build\\intermediates\\res\\merged\\debug\\drawable_ic_launcher_background.xml.flat",
-        "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\drawable\\ic_launcher_background.xml"
+        "merged": "D:\\git-workspaces\\temp2\\App\\app\\build\\intermediates\\res\\merged\\debug\\raw_midi_melodic.wav.flat",
+        "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\raw\\midi_melodic.wav"
     },
     {
-        "merged": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-xxhdpi_ic_launcher.png.flat",
-        "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\mipmap-xxhdpi\\ic_launcher.png"
+        "merged": "D:\\git-workspaces\\temp2\\App\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-xxxhdpi_ic_launcher.png.flat",
+        "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\mipmap-xxxhdpi\\ic_launcher.png"
     },
     {
-        "merged": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-xxxhdpi_ic_launcher.png.flat",
-        "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\mipmap-xxxhdpi\\ic_launcher.png"
+        "merged": "D:\\git-workspaces\\temp2\\App\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\mipmap-anydpi-v26\\ic_launcher_round.xml"
     },
     {
-        "merged": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\build\\intermediates\\res\\merged\\debug\\menu_main.xml.flat",
-        "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\menu\\main.xml"
+        "merged": "D:\\git-workspaces\\temp2\\App\\app\\build\\intermediates\\res\\merged\\debug\\layout_options.xml.flat",
+        "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\layout\\options.xml"
     },
     {
-        "merged": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-xxhdpi_ic_launcher_round.png.flat",
-        "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\mipmap-xxhdpi\\ic_launcher_round.png"
+        "merged": "D:\\git-workspaces\\temp2\\App\\app\\build\\intermediates\\res\\merged\\debug\\mipmap-xxhdpi_ic_launcher_round.png.flat",
+        "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\mipmap-xxhdpi\\ic_launcher_round.png"
     }
 ]

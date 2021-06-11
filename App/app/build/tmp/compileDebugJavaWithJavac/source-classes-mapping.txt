@@ -4,7 +4,6 @@ ch/zhaw/ch/dsp/AudioTransformer.java
  ch.zhaw.ch.dsp.AudioTransformer
 ch/zhaw/ch/dsp/phase/PhaseReseter.java
  ch.zhaw.ch.dsp.phase.PhaseReseter
- ch.zhaw.ch.dsp.phase.PhaseReseter$MidRange
 ch/zhaw/ch/fft/JTFFT.java
  ch.zhaw.ch.fft.JTFFT
 com/breakfastquay/rubberband/RubberBandStretcher.java

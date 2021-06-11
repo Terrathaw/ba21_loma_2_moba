@@ -51,8 +51,8 @@ public class Config {
     }
 
     public void setTransientDetectionType(int moduleIndex) {
-        Log.v("config", moduleIndex+"set "+TransientDetectionType.getValue(moduleIndex).getClassName());
-        module.setTransientDetector(TransientDetectionType.getValue(moduleIndex).getClassName());
+        Log.v("config", moduleIndex+"set "+TransientDetectionType.getValue(moduleIndex).getIdentifier());
+        module.setTransientDetector(TransientDetectionType.getValue(moduleIndex).getIdentifier());
     }
 
     public void setHalfToneStepsToShift(int halfToneStepsToShift) {
@@ -76,7 +76,6 @@ public class Config {
     }
 
     public void setPhaseResetType(int moduleIndex) {
-        Log.v("config", moduleIndex+"set "+ PhaseResetType.getValue(moduleIndex).getClassName());
-        module.setPhaseResetType(PhaseResetType.getValue(moduleIndex).getClassName());
+        module.setPhaseResetType(PhaseResetType.getValue(moduleIndex).getIdentifier());
     }
 }

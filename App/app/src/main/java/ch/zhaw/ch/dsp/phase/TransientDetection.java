@@ -6,10 +6,15 @@ import ch.zhaw.ch.util.ArrayUtil;
 import ch.zhaw.ch.util.AverageQueue;
 import ch.zhaw.ch.util.MovingMedian;
 
+/***
+ * Adds functionalities to detect transients in currently processed frames with their magnitude.
+ *
+ */
+
 public class TransientDetection {
     private float[] lastMagnitude;
     private float lastHighFreq;
-    private TransientDetectionType transientMode = TransientDetectionType.NONE;
+    private TransientDetectionType transientMode;
     private MovingMedian highFreqFilter;
     private MovingMedian highFreqDerivFilter;
     private float lastHighFreqDerivDelta;
@@ -18,12 +23,16 @@ public class TransientDetection {
     private float transientLikelihoodThrehold = 0.35f;
     private float minMagnitudeMod = 10e-6f;
     private AverageQueue maxMagnitudeAvgQueue;
-    //amplitude (root-power) ratio equivalent to 3 dB (10**(3/20)=10**0.15)
-    //mag1 / mag2 = 10**0.15 ---> mag1 is 3 dB over mag2
     private float magnitudeRatio3db = (float) Math.pow(10, 0.15);
 
+    /***
+     *
+     * @param frameSizeNyquist To create an internal buffer for the last magnitude
+     * @param transientMode The transient detection type this class should use.
+     */
+
     public TransientDetection(int frameSizeNyquist, TransientDetectionType transientMode){
-        Log.v("PitchShifter", transientMode.getClassName());
+        Log.v("PitchShifter", transientMode.getIdentifier());
         this.transientMode = transientMode;
         highFreqFilter = new MovingMedian(19, 85);
         highFreqDerivFilter = new MovingMedian(19, 90);
@@ -31,9 +40,15 @@ public class TransientDetection {
         lastMagnitude = ArrayUtil.rangeOfValue(frameSizeNyquist, 0f);
     }
 
-    public boolean hasTransient(float[] currentMagnitude){
-        float transientLikelihood = getTransients(currentMagnitude);
-        if(transientLikelihood > 0 &&  transientLikelihood > previousTransientLikelihood && transientLikelihood > transientLikelihoodThrehold){
+    /***
+     * Calculates if a transient is detected by comparing the current transient likelihood with the
+     * last likelihood and a likelihood threshold.
+     * @param magnitude
+     * @return If transient was detected
+     */
+    public boolean detectTransients(float[] magnitude){
+        float transientLikelihood = getTransients(magnitude);
+        if(transientLikelihood > previousTransientLikelihood && transientLikelihood > transientLikelihoodThrehold){
             previousTransientLikelihood = transientLikelihood;
             return true;
         }
@@ -42,19 +57,30 @@ public class TransientDetection {
         return false;
     }
 
+    /***
+     * Transient mode used by this class.
+     * @return Transient mode
+     */
     public TransientDetectionType getTransientMode(){
         return transientMode;
     }
 
-    private float highFreqDetection(float[] currentMagnitude){
+    /***
+     * Sums the magnitudes of all bins weighted by their frequencies and puts the results in a moving median.
+     * If the median is rising three subsequent frames a transient is detected
+     *
+     * @param magnitude
+     * @return High frequency transient probability in range 0 to 1
+     */
+    private float highFreqDetection(float[] magnitude){
         float transientProbability = 0.0f;
         float highFreq  = 0.0f;
         float highFreqDeriv;
         float highFreqDerivDelta = 0f;
         float highFreqExcess;
 
-        for (int i = 0; i < currentMagnitude.length; i++) {
-            highFreq +=  currentMagnitude[i]*i;
+        for (int i = 0; i < magnitude.length; i++) {
+            highFreq +=  magnitude[i]*i;
         }
         highFreqDeriv = highFreq - lastHighFreq;
 
@@ -63,6 +89,7 @@ public class TransientDetection {
         this.lastHighFreq = highFreq;
 
         highFreqExcess = highFreq - highFreqFilter.Get();
+
         if(highFreqExcess > 0)
             highFreqDerivDelta = highFreqDeriv - highFreqDerivFilter.Get();
 
@@ -77,37 +104,49 @@ public class TransientDetection {
         return transientProbability;
     }
 
-    private float percussiveDetection(float[] currentMagnitude){
-        maxMagnitudeAvgQueue.push(ArrayUtil.max(currentMagnitude));
+    /***
+     * Calculates the percussive transient probability by counting all the significant and the non zero bins.
+     *
+     * @param magnitude
+     * @return Percussive transient probability in range 0 to 1
+     */
+    private float percussiveDetection(float[] magnitude){
+        maxMagnitudeAvgQueue.push(ArrayUtil.max(magnitude));
         float zeroThresh = minMagnitudeMod * maxMagnitudeAvgQueue.getAvg();
         int count = 0;
         int nonZeroCount = 0;
         float magnitudeIncreaseRatio;
 
-        for(int i = 0; i < currentMagnitude.length; i++){
+        for(int i = 0; i < magnitude.length; i++){
             magnitudeIncreaseRatio = 0.0f;
             if(lastMagnitude[i] > zeroThresh)
-                magnitudeIncreaseRatio = currentMagnitude[i]/lastMagnitude[i];
-            else if(currentMagnitude[i] > zeroThresh)
+                magnitudeIncreaseRatio = magnitude[i]/lastMagnitude[i];
+            else if(magnitude[i] > zeroThresh)
                 magnitudeIncreaseRatio = magnitudeRatio3db;
             if(magnitudeIncreaseRatio >= magnitudeRatio3db)
                 count +=1;
-            if(currentMagnitude[i] > zeroThresh)
+            if(magnitude[i] > zeroThresh)
                 nonZeroCount +=1;
         }
-        System.arraycopy(currentMagnitude, 0, lastMagnitude, 0, currentMagnitude.length);
+        System.arraycopy(magnitude, 0, lastMagnitude, 0, magnitude.length);
         if(nonZeroCount == 0)
             return 0f;
         return count/nonZeroCount;
     }
 
-    private float getTransients(float[] currentMagnitude) {
+    /***
+     * Calculates transient probability according to the selected TransientDetectionType.
+     *
+     * @param magnitude
+     * @return Transient probability in range 0 to 1
+     */
+    private float getTransients(float[] magnitude) {
         if (transientMode == TransientDetectionType.PERCUSSIVE){
-            return percussiveDetection(currentMagnitude);
+            return percussiveDetection(magnitude);
         }else if(transientMode == TransientDetectionType.COMPOUND){
-            return Math.max(percussiveDetection(currentMagnitude),highFreqDetection(currentMagnitude));
+            return Math.max(percussiveDetection(magnitude),highFreqDetection(magnitude));
         }else if(transientMode == TransientDetectionType.HIGH_FREQ){
-            return highFreqDetection(currentMagnitude);
+            return highFreqDetection(magnitude);
         }
         return 0;
     }

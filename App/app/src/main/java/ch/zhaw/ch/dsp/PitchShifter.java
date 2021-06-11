@@ -14,7 +14,7 @@ import ch.zhaw.ch.fft.Window;
 import ch.zhaw.ch.util.ArrayUtil;
 
 /***
- * Provides an audioTransformer that operates in the blockwise approach described by the DAFX from U. Zoelzer.
+ * Provides an audioTransformer that operates in the blockwise approach described in http://dafx.de/DAFX_Book_Page/index.html.
  */
 
 public class PitchShifter implements AudioTransformer {
@@ -37,7 +37,7 @@ public class PitchShifter implements AudioTransformer {
 
         fft = FFT.getNewInstance(moduleInfo.getFft());
         phaseShifter = PhaseShifter.getPhaseShifter(moduleInfo.getPhaseShifter());
-        Log.v("PsBlockwise",moduleInfo.getPhaseShifter() );
+        Log.v("PitchShifter",moduleInfo.getPhaseShifter() );
         resampler = Resampler.getPhaseShifter(moduleInfo.getResampler());
 
         fft.init(info.getFrameSize());
@@ -65,6 +65,7 @@ public class PitchShifter implements AudioTransformer {
         return samplesTransformed;
     }
 
+    @Override
     public float[] transformFrame(float[] frame) {
         ArrayUtil.mul2(frame, window.getWindow(info.getFrameSize()));
         ComplexFrame fftFrame = fft.forward(frame);

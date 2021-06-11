@@ -2,6 +2,9 @@ package ch.zhaw.ch.dsp.resample;
 
 import ch.zhaw.ch.util.ArrayUtil;
 
+/***
+ * Based on DAFX Chapter 7.4.4 Block by block approach http://dafx.de/DAFX_Book_Page/index.html
+ */
 public class LinearInterpolator implements Resampler {
     private int resampleFrameSize;
     private int[] resampleIndexesLeft;

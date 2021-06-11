@@ -1,7 +1,5 @@
 package ch.zhaw.ch.dsp.phase;
 
-import android.util.Log;
-
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -12,6 +10,9 @@ import ch.zhaw.ch.dsp.ComplexFrame;
 import ch.zhaw.ch.util.ArrayUtil;
 import ch.zhaw.ch.util.DSPUtil;
 
+/***
+ * Based on Phase Vocoder Done Right pseudo code https://www.researchgate.net/publication/319503719_Phase_Vocoder_Done_Right
+ */
 public class DynamicPhaseLockedShifter extends PhaseReseter implements PhaseShifter {
 
     private static final String TAG = DynamicPhaseLockedShifter.class.getSimpleName();
@@ -52,32 +53,31 @@ public class DynamicPhaseLockedShifter extends PhaseReseter implements PhaseShif
     public float[] shift(ComplexFrame frame) {
         float[] phaseCurrent = frame.getPhase();
         float[] magnitude = frame.getMagnitude();
-        MidRange midRange = defaultMidRange;
 
         phaseDelta = ArrayUtil.sub(phaseCurrent, phaseLast);
         phaseDelta = ArrayUtil.sub(phaseDelta, omegaConsts);
         DSPUtil.princarg(phaseDelta);
         ArrayUtil.add2(phaseDelta, omegaConsts);
         ArrayUtil.mul2(phaseDelta, stretchFactor);
+        resetCurrentMidRange();
 
-        boolean transientDetected = transientDetection.getTransientMode() != TransientDetectionType.NONE && transientDetection.hasTransient(magnitude);
+        boolean transientDetected = transientDetection.getTransientMode() != TransientDetectionType.NONE && transientDetection.detectTransients(magnitude);
         if(transientDetected) {
-            Log.v("aaa", "transient detected");
-            midRange = resetPhase(phaseCurrent);
+            resetPhase(phaseCurrent);
         }
 
         if (!transientDetected || phaseResetType == PhaseResetType.BAND_LIMITED) {
             maxMagnitude = Float.max(ArrayUtil.max(magnitude), maxMagnitude);
 
             //key = bin position, value = magnitude
-            Map<Integer, Float> magnitudeCurrentPeaks = getMagnitudePeaks(magnitude, (magnitudeTolerance * maxMagnitude), midRange);
+            Map<Integer, Float> magnitudeCurrentPeaks = getMagnitudePeaks(magnitude, (magnitudeTolerance * maxMagnitude));
 
             PriorityQueue<HeapBin> magnitudeHeap = new PriorityQueue<>(1, new HeapBinComparator());
             for (Map.Entry<Integer, Float> entry : magnitudeCurrentPeaks.entrySet()) {
                 magnitudeHeap.add(new HeapBin(entry.getKey(), -1, magnitudeLast[entry.getKey()], 0));
             }
 
-            for (int i = midRange.min; i < midRange.max; i++) {
+            for (int i = currentMidRange[0]; i < currentMidRange[1]; i++) {
                 if (!magnitudeCurrentPeaks.containsKey(i))
                     phaseTransformed[i] = DSPUtil.princarg(phaseTransformed[i] + phaseDelta[i]);
             }
@@ -112,10 +112,10 @@ public class DynamicPhaseLockedShifter extends PhaseReseter implements PhaseShif
         return phaseTransformed;
     }
 
-    private Map<Integer, Float> getMagnitudePeaks(float[] magnitude, float minMagnitude, MidRange midRange) {
+    private Map<Integer, Float> getMagnitudePeaks(float[] magnitude, float minMagnitude) {
         Map<Integer, Float> magnitudeCurrentPeaks = new HashMap();
 
-        for (int i = midRange.min; i < midRange.max; i++) {
+        for (int i = currentMidRange[0]; i < currentMidRange[1]; i++) {
             if (magnitude[i] > minMagnitude) {
                 magnitudeCurrentPeaks.put(i, magnitude[i]);
             }

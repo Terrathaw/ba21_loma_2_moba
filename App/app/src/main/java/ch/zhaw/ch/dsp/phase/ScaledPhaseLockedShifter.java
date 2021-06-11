@@ -7,6 +7,10 @@ import ch.zhaw.ch.dsp.ComplexFrame;
 import ch.zhaw.ch.util.ArrayUtil;
 import ch.zhaw.ch.util.DSPUtil;
 
+/***
+ * Based on Improved Phase Vocoder Time-Scale Modification of Audio Chapter III.C.2 Scaled Phase Locking https://ieeexplore.ieee.org/document/759041
+ * and DAFX Chapter 7.4.3 Phase locked vocoder http://dafx.de/DAFX_Book_Page/index.html
+ */
 public class ScaledPhaseLockedShifter extends PhaseReseter implements PhaseShifter {
     private final String TAG = ScaledPhaseLockedShifter.class.getSimpleName();
 
@@ -44,21 +48,21 @@ public class ScaledPhaseLockedShifter extends PhaseReseter implements PhaseShift
         float[] currentMagnitude = frame.getMagnitude();
         float[] phaseTransformedTemp;
         ArrayList<Integer> currentMagnitudePeaks = getMagnitudePeaks(currentMagnitude);
-        MidRange midRange = defaultMidRange;
+        resetCurrentMidRange();
 
-        boolean transientDetected = transientDetection.getTransientMode() != TransientDetectionType.NONE && transientDetection.hasTransient(frame.getMagnitude());
+        boolean transientDetected = transientDetection.getTransientMode() != TransientDetectionType.NONE && transientDetection.detectTransients(frame.getMagnitude());
 
         if (transientDetected)
-            midRange = resetPhase(currentPhase);
+            resetPhase(currentPhase);
 
         if (!transientDetected || phaseResetType == PhaseResetType.BAND_LIMITED) {
             if (currentMagnitudePeaks.size() > 0 && lastMagnitudePeaks.size() > 0) {
                 phaseTransformedTemp = magnitudePeakTransformation(currentPhase, currentMagnitude, currentMagnitudePeaks, transientDetected);
-                for (int i = midRange.min; i < midRange.max; i++) {
+                for (int i = currentMidRange[0]; i < currentMidRange[1]; i++) {
                     phaseTransformed[i] = phaseTransformedTemp[i];
                 }
             } else {
-                normalCalculation(currentPhase, midRange);
+                normalCalculation(currentPhase);
             }
         }
 
@@ -119,9 +123,9 @@ public class ScaledPhaseLockedShifter extends PhaseReseter implements PhaseShift
         return previousPeakPosition;
     }
 
-    private void normalCalculation(float[] currentPhase, MidRange midRange) {
+    private void normalCalculation(float[] currentPhase) {
         float deltaPhase;
-        for (int i = midRange.min; i < midRange.max; i++) {
+        for (int i = currentMidRange[0]; i < currentMidRange[1]; i++) {
             deltaPhase = expectedPhaseDelta[i] + DSPUtil.princarg(currentPhase[i] - lastPhase[i] - expectedPhaseDelta[i]);
             phaseTransformed[i] = phaseTransformed[i] + deltaPhase * stretchFactor;
         }

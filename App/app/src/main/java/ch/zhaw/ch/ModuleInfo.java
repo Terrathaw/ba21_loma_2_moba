@@ -39,8 +39,8 @@ public class ModuleInfo {
         phaseShifter = DynamicPhaseLockedShifter.class.getName();
         resampler = LinearInterpolator.class.getName();
         visualizer = FrequencyVisualizer.class.getName();
-        transientDetector = TransientDetectionType.COMPOUND.getClassName();
-        phaseResetType = PhaseResetType.BAND_LIMITED.getClassName();
+        transientDetector = TransientDetectionType.COMPOUND.getIdentifier();
+        phaseResetType = PhaseResetType.BAND_LIMITED.getIdentifier();
 
         modules = new HashMap<>();
         ArrayList<String> list = new ArrayList<>();

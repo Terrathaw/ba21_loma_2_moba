@@ -11,7 +11,7 @@ import ch.zhaw.ch.dsp.phase.PhaseResetType;
 import ch.zhaw.ch.dsp.phase.TransientDetectionType;
 
 /***
- * This audiotransformer uses the nativ client interface of rubberband.
+ * This audiotransformer uses the nativ client interface of RubberBand.
  */
 
 public class RubberBand implements AudioTransformer {

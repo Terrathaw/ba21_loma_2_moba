@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values\\values.xml",
+            "outputFile": "D:\\git-workspaces\\temp2\\App\\app\\build\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values\\values.xml",
             "map": [
                 {
                     "source": "C:\\Users\\simon\\.gradle\\caches\\transforms-2\\files-2.1\\7f3965b4f5235273164a4cb8d86e6a3b\\jetified-appcompat-resources-1.1.0\\res\\values\\values.xml",
@@ -23,7 +23,7 @@
                     }
                 },
                 {
-                    "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\values\\strings.xml",
+                    "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\values\\strings.xml",
                     "from": {
                         "startLines": "1",
                         "startColumns": "4",
@@ -37,25 +37,6 @@
                         "startOffsets": "48369",
                         "endColumns": "50",
                         "endOffsets": "48415"
-                    }
-                },
-                {
-                    "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\values\\themes.xml",
-                    "from": {
-                        "startLines": "2",
-                        "startColumns": "4",
-                        "startOffsets": "102",
-                        "endLines": "14",
-                        "endColumns": "12",
-                        "endOffsets": "835"
-                    },
-                    "to": {
-                        "startLines": "3292",
-                        "startColumns": "4",
-                        "startOffsets": "218817",
-                        "endLines": "3304",
-                        "endColumns": "12",
-                        "endOffsets": "219536"
                     }
                 },
                 {
@@ -205,23 +186,6 @@
                     }
                 },
                 {
-                    "source": "D:\\git-workspaces\\ba21_loma-2\\moba - Copy\\App\\app\\src\\main\\res\\values\\colors.xml",
-                    "from": {
-                        "startLines": "7,2,3,4,5,6,8",
-                        "startColumns": "4,4,4,4,4,4,4",
-                        "startOffsets": "293,57,105,153,201,247,336",
-                        "endColumns": "41,46,46,46,44,44,41",
-                        "endOffsets": "330,99,147,195,241,287,373"
-                    },
-                    "to": {
-                        "startLines": "224,313,314,315,326,327,330",
-                        "startColumns": "4,4,4,4,4,4,4",
-                        "startOffsets": "11641,17723,17770,17817,18561,18606,18772",
-                        "endColumns": "41,46,46,46,44,44,41",
-                        "endOffsets": "11678,17765,17812,17859,18601,18646,18809"
-                    }
-                },
-                {
                     "source": "C:\\Users\\simon\\.gradle\\caches\\transforms-2\\files-2.1\\3b91b187821fc6e4f6300506297b769e\\jetified-viewpager2-1.0.0\\res\\values\\values.xml",
                     "from": {
                         "startLines": "2",
@@ -238,6 +202,25 @@
                         "endLines": "7069",
                         "endColumns": "24",
                         "endOffsets": "443983"
+                    }
+                },
+                {
+                    "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\values\\themes.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "102",
+                        "endLines": "14",
+                        "endColumns": "12",
+                        "endOffsets": "835"
+                    },
+                    "to": {
+                        "startLines": "3292",
+                        "startColumns": "4",
+                        "startOffsets": "218817",
+                        "endLines": "3304",
+                        "endColumns": "12",
+                        "endOffsets": "219536"
                     }
                 },
                 {
@@ -276,6 +259,23 @@
                         "endLines": "4,12,18,34,35,36,44,55,56,57,60,61,64,67,68,69,70,71,74,77,78,79,80,85,88,91,92,93,98,99,100,103,106,107,110,113,116,119,120,123,126,127,132,133,138,141,144,145,146,147,148,149,150,151,152,153,162,5589,5590,5591,5906",
                         "endColumns": "60,11,47,51,60,45,11,60,59,69,11,67,11,11,61,64,67,66,11,11,66,64,64,11,11,11,65,66,11,68,65,11,11,66,11,11,11,11,64,11,11,64,11,66,11,11,11,64,61,61,61,58,59,60,60,58,11,2575,131,3263,107",
                         "endOffsets": "292,583,915,1725,1786,1832,2191,2781,2841,2911,3044,3112,3241,3367,3429,3494,3562,3629,3752,3877,3944,4009,4074,4255,4376,4497,4563,4630,4840,4909,4975,5100,5226,5293,5419,5546,5671,5798,5863,5989,6112,6177,6385,6452,6632,6752,6872,6937,6999,7061,7123,7182,7242,7303,7364,7423,7798,359624,359756,363020,381249"
+                    }
+                },
+                {
+                    "source": "D:\\git-workspaces\\temp2\\App\\app\\src\\main\\res\\values\\colors.xml",
+                    "from": {
+                        "startLines": "7,2,3,4,5,6,8",
+                        "startColumns": "4,4,4,4,4,4,4",
+                        "startOffsets": "293,57,105,153,201,247,336",
+                        "endColumns": "41,46,46,46,44,44,41",
+                        "endOffsets": "330,99,147,195,241,287,373"
+                    },
+                    "to": {
+                        "startLines": "224,313,314,315,326,327,330",
+                        "startColumns": "4,4,4,4,4,4,4",
+                        "startOffsets": "11641,17723,17770,17817,18561,18606,18772",
+                        "endColumns": "41,46,46,46,44,44,41",
+                        "endOffsets": "11678,17765,17812,17859,18601,18646,18809"
                     }
                 }
             ]
