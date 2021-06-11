@@ -15,7 +15,6 @@ The written file contains the exact data that has been streamed to the phones sp
 | Name  | Description | Status | Source|
 | ------------- | ------------- | ------------- | ------------ |
 | Basic Phase Shifter  | Simple phase vocoder limited to horizontal phase propagation  | Complete  | Based on DAFX Chapter 7.4.4 Block by block approach http://dafx.de/DAFX_Book_Page/index.html |
-| Scaled Phase Locked Shifter  | Advanced phase vocoder with connected peak detection and phase locking | Complete  | Based on Improved Phase Vocoder
-Time-Scale Modification of Audio Scaled Phase locking https://ieeexplore.ieee.org/document/759041 |
+| Scaled Phase Locked Shifter  | Advanced phase vocoder with connected peak detection and phase locking | Complete  | Based on Improved Phase Vocoder Time-Scale Modification of Audio Scaled Phase locking https://ieeexplore.ieee.org/document/759041 |
 | Dynamic Phase Locked Shifter  | Advanced phase vocoder with peak detection and dynamic vertical phase propagation | In Progress  | Based on Phase Vocoder Done Right pseudo code https://www.researchgate.net/publication/319503719_Phase_Vocoder_Done_Right |
 | Rubberband | The rubberband audio library from breakfastquay integrated with default settings (-c 5) optimized for percussion | Integrated | Made available by breakfastquay  https://breakfastquay.com/rubberband/ |

@@ -151,7 +151,7 @@
       <command value="gradle app:build" />
     </option>
   </component>
-  <component name="RunManager" selected="Android JUnit.java in Audio_Shifter.app">
+  <component name="RunManager" selected="Android App.app">
     <configuration name="DSPUtilTest.princargFullLoad_isCorrect" type="AndroidJUnit" factoryName="Android JUnit" nameIsGenerated="true">
       <module name="Audio_Shifter.app" />
       <extension name="coverage">
