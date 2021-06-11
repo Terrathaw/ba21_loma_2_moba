@@ -1,0 +1,445 @@
+Index: app/src/main/java/ch/zhaw/ch/dsp/phase/PhaseReseter.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ch.zhaw.ch.dsp.phase;\r\n\r\nimport android.util.Log;\r\n\r\nimport ch.zhaw.ch.dsp.TransientDetection;\r\nimport ch.zhaw.ch.util.ArrayUtil;\r\n\r\npublic abstract class PhaseReseter {\r\n    protected PhaseResetType phaseResetType = PhaseResetType.BAND_LIMITED;\r\n    protected double[] phaseTransformed;\r\n    protected int frameSizeNyquist;\r\n    protected int frameIndex;\r\n    protected int bandLow;\r\n    protected int bandHigh;\r\n    protected MidRange defaultMidRange;\r\n    protected TransientDetection transientDetection;\r\n\r\n\r\n    protected void setup(int frameSize, int sampleRate){\r\n        bandLow = (int) Math.floor(150*frameSize / sampleRate);\r\n        bandHigh = (int) Math.floor(1000*frameSize / sampleRate);\r\n        Log.v(\"aaa\", \"\"+frameSizeNyquist);\r\n        defaultMidRange = new MidRange(0, frameSizeNyquist);\r\n\r\n    }\r\n\r\n    protected MidRange resetPhase(float[] phase){\r\n\r\n        if(phaseResetType.equals(PhaseResetType.BAND_LIMITED)){\r\n            for(int i = 0; i < bandLow; i++){\r\n                phaseTransformed[i] = phase[i];\r\n            }\r\n            for(int i = bandHigh; i < frameSizeNyquist; i++){\r\n                phaseTransformed[i] = phase[i];\r\n            }\r\n            return new MidRange(bandLow, bandHigh);\r\n        }else{\r\n            phaseTransformed = ArrayUtil.floatToDouble(phase);\r\n            return defaultMidRange;\r\n        }\r\n    }\r\n\r\n    public void setPhaseResetType(PhaseResetType phaseResetType) {\r\n        Log.v(\"aaa\", phaseResetType.getClassName());\r\n        this.phaseResetType = phaseResetType;\r\n    }\r\n\r\n    class MidRange{\r\n        public int min;\r\n        public int max;\r\n        MidRange(int min, int max){\r\n            this.min = min;\r\n            this.max = max;\r\n        }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/ch/zhaw/ch/dsp/phase/PhaseReseter.java	(revision 4fe02a4754e1a535bb70c0e32191f2454538984c)
++++ app/src/main/java/ch/zhaw/ch/dsp/phase/PhaseReseter.java	(date 1623364565172)
+@@ -7,7 +7,7 @@
+ 
+ public abstract class PhaseReseter {
+     protected PhaseResetType phaseResetType = PhaseResetType.BAND_LIMITED;
+-    protected double[] phaseTransformed;
++    protected float[] phaseTransformed;
+     protected int frameSizeNyquist;
+     protected int frameIndex;
+     protected int bandLow;
+@@ -35,7 +35,7 @@
+             }
+             return new MidRange(bandLow, bandHigh);
+         }else{
+-            phaseTransformed = ArrayUtil.floatToDouble(phase);
++            phaseTransformed = phase;
+             return defaultMidRange;
+         }
+     }
+Index: app/src/main/java/ch/zhaw/ch/dsp/phase/BasicPhaseShifter.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ch.zhaw.ch.dsp.phase;\r\n\r\nimport android.util.Log;\r\n\r\nimport java.util.Arrays;\r\n\r\nimport ch.zhaw.ch.dsp.ComplexFrame;\r\nimport ch.zhaw.ch.dsp.TransientDetection;\r\nimport ch.zhaw.ch.dsp.TransientDetectionType;\r\nimport ch.zhaw.ch.util.ArrayUtil;\r\nimport ch.zhaw.ch.util.DSPUtil;\r\n\r\npublic class BasicPhaseShifter extends PhaseReseter implements PhaseShifter {\r\n\r\n    private double[] omegaConsts;\r\n    private double[] lastPhase;\r\n    private double[] phaseDelta;\r\n    private double stretchFactor;\r\n    private double[] phaseTransformedTemp;\r\n\r\n    @Override\r\n    public void init(int frameSize, int frameSizeNyquist, int hopSizeAnalysis, float stretchFactor, int sampleRate, TransientDetection transientDetection, PhaseResetType phaseResetType) {\r\n        this.stretchFactor = stretchFactor;\r\n        this.frameSizeNyquist = frameSizeNyquist;\r\n        setup(frameSize, sampleRate);\r\n        setPhaseResetType(phaseResetType);\r\n        double[] normalizedRange = ArrayUtil.div(ArrayUtil.range(frameSizeNyquist), (double) frameSize);\r\n        omegaConsts = ArrayUtil.mul(normalizedRange, (2.0 * Math.PI * hopSizeAnalysis));\r\n\r\n        lastPhase = ArrayUtil.rangeOfValue(frameSizeNyquist, 0d);\r\n        phaseDelta = ArrayUtil.rangeOfValue(frameSizeNyquist, 0d);\r\n        phaseTransformed = ArrayUtil.rangeOfValue(frameSizeNyquist, 0d);\r\n\r\n        this.transientDetection = transientDetection;\r\n    }\r\n\r\n    @Override\r\n    public float[] shift(ComplexFrame frame) {\r\n        float[] currentPhase = frame.getPhase();\r\n        phaseDelta = ArrayUtil.sub(currentPhase, lastPhase);\r\n        lastPhase = ArrayUtil.floatToDouble(currentPhase);\r\n        MidRange midRange = defaultMidRange;\r\n\r\n        boolean transientDetected = transientDetection.getTransientMode() != TransientDetectionType.NONE && transientDetection.detectTransients(frame.getMagnitude());\r\n\r\n        if(transientDetected) {\r\n            Log.v(\"aaa\", \"transient detected\");\r\n            midRange = resetPhase(currentPhase);\r\n        }\r\n\r\n        if (!transientDetected || phaseResetType == PhaseResetType.BAND_LIMITED) {\r\n            if(phaseResetType == PhaseResetType.BAND_LIMITED) {\r\n                phaseTransformedTemp = calculate(\r\n                        ArrayUtil.getSubArray(phaseTransformed, midRange.min, midRange.max),\r\n                        ArrayUtil.getSubArray(phaseDelta, midRange.min, midRange.max),\r\n                        ArrayUtil.getSubArray(omegaConsts, midRange.min, midRange.max)\r\n                );\r\n            }else {\r\n                phaseTransformedTemp = calculate(phaseTransformed, phaseDelta, omegaConsts);\r\n            }\r\n            for(int i = 0; i < phaseTransformedTemp.length; i++){\r\n                phaseTransformed[midRange.min+i] = phaseTransformedTemp[i];\r\n            }\r\n        }\r\n\r\n        return ArrayUtil.doubleToFloat(phaseTransformed);\r\n    }\r\n\r\n    public double[] shift(double[] phase) {\r\n        phaseDelta = ArrayUtil.sub(phase, lastPhase);\r\n        lastPhase = Arrays.copyOf(phase, phase.length);\r\n\r\n        ArrayUtil.sub2(phaseDelta, omegaConsts);\r\n        DSPUtil.princarg(phaseDelta);\r\n        ArrayUtil.add2(phaseDelta, omegaConsts);\r\n        ArrayUtil.mul2(phaseDelta, stretchFactor);\r\n        ArrayUtil.add2(phaseTransformed, phaseDelta);\r\n        DSPUtil.princarg(phaseTransformed);\r\n        return Arrays.copyOf(phaseTransformed, phaseTransformed.length);\r\n    }\r\n\r\n    public double[] calculate(double[] phaseTransformed, double[] phaseDelta, double[] omegaConsts){\r\n        ArrayUtil.sub2(phaseDelta, omegaConsts);\r\n        DSPUtil.princarg(phaseDelta);\r\n        ArrayUtil.add2(phaseDelta, omegaConsts);\r\n        ArrayUtil.mul2(phaseDelta, stretchFactor);\r\n        ArrayUtil.add2(phaseTransformed, phaseDelta);\r\n        DSPUtil.princarg(phaseTransformed);\r\n        return phaseTransformed;\r\n    }\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/ch/zhaw/ch/dsp/phase/BasicPhaseShifter.java	(revision 4fe02a4754e1a535bb70c0e32191f2454538984c)
++++ app/src/main/java/ch/zhaw/ch/dsp/phase/BasicPhaseShifter.java	(date 1623365090212)
+@@ -12,11 +12,11 @@
+ 
+ public class BasicPhaseShifter extends PhaseReseter implements PhaseShifter {
+ 
+-    private double[] omegaConsts;
+-    private double[] lastPhase;
+-    private double[] phaseDelta;
+-    private double stretchFactor;
+-    private double[] phaseTransformedTemp;
++    private float[] omegaConsts;
++    private float[] lastPhase;
++    private float[] phaseDelta;
++    private float stretchFactor;
++    private float[] phaseTransformedTemp;
+ 
+     @Override
+     public void init(int frameSize, int frameSizeNyquist, int hopSizeAnalysis, float stretchFactor, int sampleRate, TransientDetection transientDetection, PhaseResetType phaseResetType) {
+@@ -24,12 +24,12 @@
+         this.frameSizeNyquist = frameSizeNyquist;
+         setup(frameSize, sampleRate);
+         setPhaseResetType(phaseResetType);
+-        double[] normalizedRange = ArrayUtil.div(ArrayUtil.range(frameSizeNyquist), (double) frameSize);
+-        omegaConsts = ArrayUtil.mul(normalizedRange, (2.0 * Math.PI * hopSizeAnalysis));
++        float[] normalizedRange = ArrayUtil.div(ArrayUtil.range(frameSizeNyquist), frameSize);
++        omegaConsts = ArrayUtil.mul(normalizedRange, (2f * DSPUtil.PI * hopSizeAnalysis));
+ 
+-        lastPhase = ArrayUtil.rangeOfValue(frameSizeNyquist, 0d);
+-        phaseDelta = ArrayUtil.rangeOfValue(frameSizeNyquist, 0d);
+-        phaseTransformed = ArrayUtil.rangeOfValue(frameSizeNyquist, 0d);
++        lastPhase = ArrayUtil.rangeOfValue(frameSizeNyquist, 0f);
++        phaseDelta = ArrayUtil.rangeOfValue(frameSizeNyquist, 0f);
++        phaseTransformed = ArrayUtil.rangeOfValue(frameSizeNyquist, 0f);
+ 
+         this.transientDetection = transientDetection;
+     }
+@@ -38,7 +38,7 @@
+     public float[] shift(ComplexFrame frame) {
+         float[] currentPhase = frame.getPhase();
+         phaseDelta = ArrayUtil.sub(currentPhase, lastPhase);
+-        lastPhase = ArrayUtil.floatToDouble(currentPhase);
++        lastPhase = currentPhase;
+         MidRange midRange = defaultMidRange;
+ 
+         boolean transientDetected = transientDetection.getTransientMode() != TransientDetectionType.NONE && transientDetection.detectTransients(frame.getMagnitude());
+@@ -51,9 +51,9 @@
+         if (!transientDetected || phaseResetType == PhaseResetType.BAND_LIMITED) {
+             if(phaseResetType == PhaseResetType.BAND_LIMITED) {
+                 phaseTransformedTemp = calculate(
+-                        ArrayUtil.getSubArray(phaseTransformed, midRange.min, midRange.max),
+-                        ArrayUtil.getSubArray(phaseDelta, midRange.min, midRange.max),
+-                        ArrayUtil.getSubArray(omegaConsts, midRange.min, midRange.max)
++                        Arrays.copyOfRange(phaseTransformed, midRange.min, midRange.max),
++                        Arrays.copyOfRange(phaseDelta, midRange.min, midRange.max),
++                        Arrays.copyOfRange(omegaConsts, midRange.min, midRange.max)
+                 );
+             }else {
+                 phaseTransformedTemp = calculate(phaseTransformed, phaseDelta, omegaConsts);
+@@ -63,23 +63,10 @@
+             }
+         }
+ 
+-        return ArrayUtil.doubleToFloat(phaseTransformed);
++        return phaseTransformed;
+     }
+ 
+-    public double[] shift(double[] phase) {
+-        phaseDelta = ArrayUtil.sub(phase, lastPhase);
+-        lastPhase = Arrays.copyOf(phase, phase.length);
+-
+-        ArrayUtil.sub2(phaseDelta, omegaConsts);
+-        DSPUtil.princarg(phaseDelta);
+-        ArrayUtil.add2(phaseDelta, omegaConsts);
+-        ArrayUtil.mul2(phaseDelta, stretchFactor);
+-        ArrayUtil.add2(phaseTransformed, phaseDelta);
+-        DSPUtil.princarg(phaseTransformed);
+-        return Arrays.copyOf(phaseTransformed, phaseTransformed.length);
+-    }
+-
+-    public double[] calculate(double[] phaseTransformed, double[] phaseDelta, double[] omegaConsts){
++    public float[] calculate(float[] phaseTransformed, float[] phaseDelta, float[] omegaConsts){
+         ArrayUtil.sub2(phaseDelta, omegaConsts);
+         DSPUtil.princarg(phaseDelta);
+         ArrayUtil.add2(phaseDelta, omegaConsts);
+Index: app/src/main/java/ch/zhaw/ch/dsp/phase/DynamicPhaseLockedShifter.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ch.zhaw.ch.dsp.phase;\r\n\r\nimport android.util.Log;\r\n\r\nimport java.util.Arrays;\r\nimport java.util.Comparator;\r\nimport java.util.HashMap;\r\nimport java.util.Map;\r\nimport java.util.PriorityQueue;\r\n\r\nimport ch.zhaw.ch.dsp.ComplexFrame;\r\nimport ch.zhaw.ch.dsp.TransientDetection;\r\nimport ch.zhaw.ch.dsp.TransientDetectionType;\r\nimport ch.zhaw.ch.util.ArrayUtil;\r\nimport ch.zhaw.ch.util.DSPUtil;\r\n\r\npublic class DynamicPhaseLockedShifter extends PhaseReseter implements PhaseShifter {\r\n\r\n    private static final String TAG = DynamicPhaseLockedShifter.class.getSimpleName();\r\n\r\n    private double[] omegaConsts;\r\n    private double[] phaseLast;\r\n    private double[] phaseDelta;\r\n    private double[] phaseDeltaLast;\r\n    private double stretchFactor;\r\n    private double magnitudeTolerance;\r\n    private double maxMagnitude;\r\n    private double[] magnitudeLast;\r\n\r\n\r\n    @Override\r\n    public void init(int frameSize, int frameSizeNyquist, int hopSizeAnalysis, float stretchFactor, int sampleRate, TransientDetection transientDetection, PhaseResetType phaseResetType) {\r\n        this.frameSizeNyquist = frameSizeNyquist;\r\n        this.stretchFactor = stretchFactor;\r\n        double[] normalizedRange = ArrayUtil.div(ArrayUtil.range(frameSizeNyquist), (double) frameSize);\r\n        omegaConsts = ArrayUtil.mul(normalizedRange, (2.0 * Math.PI * hopSizeAnalysis));\r\n\r\n        phaseLast = ArrayUtil.rangeOfValue(frameSizeNyquist, 0d);\r\n        phaseDelta = ArrayUtil.rangeOfValue(frameSizeNyquist, 0d);\r\n        phaseDeltaLast = ArrayUtil.rangeOfValue(frameSizeNyquist, 0d);\r\n        phaseTransformed = ArrayUtil.rangeOfValue(frameSizeNyquist, 0d);\r\n        magnitudeLast = ArrayUtil.rangeOfValue(frameSizeNyquist, 0d);\r\n\r\n        magnitudeTolerance = Math.pow(10, -6);\r\n\r\n        maxMagnitude = 0;\r\n        frameIndex = 0;\r\n        setup(frameSize, sampleRate);\r\n        setPhaseResetType(phaseResetType);\r\n        this.transientDetection = transientDetection;\r\n    }\r\n\r\n    @Override\r\n    public float[] shift(ComplexFrame frame) {\r\n        float[] phaseCurrent = frame.getPhase();\r\n        float[] magnitude = frame.getMagnitude();\r\n        MidRange midRange = defaultMidRange;\r\n\r\n        phaseDelta = ArrayUtil.sub(phaseCurrent, phaseLast);\r\n        phaseDelta = ArrayUtil.sub(phaseDelta, omegaConsts);\r\n        DSPUtil.princarg(phaseDelta);\r\n        ArrayUtil.add2(phaseDelta, omegaConsts);\r\n        ArrayUtil.mul2(phaseDelta, stretchFactor);\r\n\r\n        boolean transientDetected = transientDetection.getTransientMode() != TransientDetectionType.NONE && transientDetection.detectTransients(magnitude);\r\n        if(transientDetected) {\r\n            Log.v(\"aaa\", \"transient detected\");\r\n            midRange = resetPhase(phaseCurrent);\r\n        }\r\n\r\n        if (!transientDetected || phaseResetType == PhaseResetType.BAND_LIMITED) {\r\n            maxMagnitude = (double) Float.max(ArrayUtil.max(magnitude), (float) maxMagnitude);\r\n\r\n            //key = bin position, value = magnitude\r\n            Map<Integer, Float> magnitudeCurrentPeaks = getMagnitudePeaks(magnitude, (float) (magnitudeTolerance * maxMagnitude), midRange);\r\n\r\n            PriorityQueue<HeapBin> magnitudeHeap = new PriorityQueue<>(1, new HeapBinComparator());\r\n            for (Map.Entry<Integer, Float> entry : magnitudeCurrentPeaks.entrySet()) {\r\n                magnitudeHeap.add(new HeapBin(entry.getKey(), -1, (float) magnitudeLast[entry.getKey()], 0));\r\n            }\r\n\r\n            for (int i = midRange.min; i < midRange.max; i++) {\r\n                if (!magnitudeCurrentPeaks.containsKey(i))\r\n                    phaseTransformed[i] = DSPUtil.princarg(phaseTransformed[i] + phaseDelta[i]);\r\n            }\r\n\r\n            int binIndex;\r\n            int timeIndex;\r\n            while (!magnitudeCurrentPeaks.isEmpty() && !magnitudeHeap.isEmpty()) {\r\n                HeapBin maxBin = magnitudeHeap.poll();\r\n                binIndex = maxBin.binIndex;\r\n                timeIndex = maxBin.timeIndex;\r\n                if (timeIndex < 0 && magnitudeCurrentPeaks.containsKey(binIndex)) {\r\n                    phaseTransformed[binIndex] += ((phaseDeltaLast[binIndex] + phaseDelta[binIndex]) / 2);\r\n                    magnitudeHeap.add(new HeapBin(binIndex, 0, magnitudeCurrentPeaks.get(binIndex),  DSPUtil.princarg(phaseTransformed[binIndex]- phaseCurrent[binIndex])));\r\n                    magnitudeCurrentPeaks.remove(binIndex);\r\n                } else if (timeIndex >= 0) {\r\n                    for(int otherBinIndex = binIndex-1; otherBinIndex <= binIndex+1; otherBinIndex++){\r\n                        if(magnitudeCurrentPeaks.containsKey(otherBinIndex)){\r\n                            phaseTransformed[otherBinIndex] = DSPUtil.princarg(phaseCurrent[otherBinIndex] + maxBin.phaseRotation);\r\n                            magnitudeHeap.add(new HeapBin(otherBinIndex, 0, magnitude[otherBinIndex], maxBin.phaseRotation));\r\n                            magnitudeCurrentPeaks.remove(otherBinIndex);\r\n                        }\r\n                    }\r\n                }\r\n            }\r\n        }\r\n\r\n        phaseLast = Arrays.copyOf(ArrayUtil.floatToDouble(phaseCurrent), phaseCurrent.length);\r\n        phaseDeltaLast = Arrays.copyOf(phaseDelta, phaseCurrent.length);\r\n        magnitudeLast = Arrays.copyOf(ArrayUtil.floatToDouble(magnitude), magnitude.length);\r\n        frameIndex++;\r\n\r\n        return ArrayUtil.doubleToFloat(phaseTransformed);\r\n    }\r\n\r\n    private Map<Integer, Float> getMagnitudePeaks(float[] magnitude, float minMagnitude, MidRange midRange) {\r\n        Map<Integer, Float> magnitudeCurrentPeaks = new HashMap();\r\n\r\n        for (int i = midRange.min; i < midRange.max; i++) {\r\n            if (magnitude[i] > minMagnitude) {\r\n                magnitudeCurrentPeaks.put(i, magnitude[i]);\r\n            }\r\n        }\r\n\r\n        return magnitudeCurrentPeaks;\r\n    }\r\n\r\n    class HeapBin {\r\n        int binIndex;\r\n        int timeIndex;\r\n        float magnitude;\r\n        double phaseRotation;\r\n\r\n        public HeapBin(int binIndex, int timeIndex, float magnitude, double phaseRotation) {\r\n            this.binIndex = binIndex;\r\n            this.timeIndex = timeIndex;\r\n            this.magnitude = magnitude;\r\n            this.phaseRotation = phaseRotation;\r\n        }\r\n    }\r\n\r\n    class HeapBinComparator implements Comparator<HeapBin> {\r\n\r\n        @Override\r\n        public int compare(HeapBin o1, HeapBin o2) {\r\n            if (o1.magnitude < o2.magnitude) {\r\n                return 1;\r\n            } else if (o1.magnitude > o2.magnitude) {\r\n                return -1;\r\n            }\r\n            return 0;\r\n        }\r\n    }\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/ch/zhaw/ch/dsp/phase/DynamicPhaseLockedShifter.java	(revision 4fe02a4754e1a535bb70c0e32191f2454538984c)
++++ app/src/main/java/ch/zhaw/ch/dsp/phase/DynamicPhaseLockedShifter.java	(date 1623365277747)
+@@ -18,30 +18,30 @@
+ 
+     private static final String TAG = DynamicPhaseLockedShifter.class.getSimpleName();
+ 
+-    private double[] omegaConsts;
+-    private double[] phaseLast;
+-    private double[] phaseDelta;
+-    private double[] phaseDeltaLast;
+-    private double stretchFactor;
+-    private double magnitudeTolerance;
+-    private double maxMagnitude;
+-    private double[] magnitudeLast;
++    private float[] omegaConsts;
++    private float[] phaseLast;
++    private float[] phaseDelta;
++    private float[] phaseDeltaLast;
++    private float stretchFactor;
++    private float magnitudeTolerance;
++    private float maxMagnitude;
++    private float[] magnitudeLast;
+ 
+ 
+     @Override
+     public void init(int frameSize, int frameSizeNyquist, int hopSizeAnalysis, float stretchFactor, int sampleRate, TransientDetection transientDetection, PhaseResetType phaseResetType) {
+         this.frameSizeNyquist = frameSizeNyquist;
+         this.stretchFactor = stretchFactor;
+-        double[] normalizedRange = ArrayUtil.div(ArrayUtil.range(frameSizeNyquist), (double) frameSize);
+-        omegaConsts = ArrayUtil.mul(normalizedRange, (2.0 * Math.PI * hopSizeAnalysis));
++        float[] normalizedRange = ArrayUtil.div(ArrayUtil.range(frameSizeNyquist), frameSize);
++        omegaConsts = ArrayUtil.mul(normalizedRange, (2f * DSPUtil.PI * hopSizeAnalysis));
+ 
+-        phaseLast = ArrayUtil.rangeOfValue(frameSizeNyquist, 0d);
+-        phaseDelta = ArrayUtil.rangeOfValue(frameSizeNyquist, 0d);
+-        phaseDeltaLast = ArrayUtil.rangeOfValue(frameSizeNyquist, 0d);
+-        phaseTransformed = ArrayUtil.rangeOfValue(frameSizeNyquist, 0d);
+-        magnitudeLast = ArrayUtil.rangeOfValue(frameSizeNyquist, 0d);
++        phaseLast = ArrayUtil.rangeOfValue(frameSizeNyquist, 0f);
++        phaseDelta = ArrayUtil.rangeOfValue(frameSizeNyquist, 0f);
++        phaseDeltaLast = ArrayUtil.rangeOfValue(frameSizeNyquist, 0f);
++        phaseTransformed = ArrayUtil.rangeOfValue(frameSizeNyquist, 0f);
++        magnitudeLast = ArrayUtil.rangeOfValue(frameSizeNyquist, 0f);
+ 
+-        magnitudeTolerance = Math.pow(10, -6);
++        magnitudeTolerance = 10e-6f;
+ 
+         maxMagnitude = 0;
+         frameIndex = 0;
+@@ -69,14 +69,14 @@
+         }
+ 
+         if (!transientDetected || phaseResetType == PhaseResetType.BAND_LIMITED) {
+-            maxMagnitude = (double) Float.max(ArrayUtil.max(magnitude), (float) maxMagnitude);
++            maxMagnitude = Float.max(ArrayUtil.max(magnitude), maxMagnitude);
+ 
+             //key = bin position, value = magnitude
+-            Map<Integer, Float> magnitudeCurrentPeaks = getMagnitudePeaks(magnitude, (float) (magnitudeTolerance * maxMagnitude), midRange);
++            Map<Integer, Float> magnitudeCurrentPeaks = getMagnitudePeaks(magnitude, (magnitudeTolerance * maxMagnitude), midRange);
+ 
+             PriorityQueue<HeapBin> magnitudeHeap = new PriorityQueue<>(1, new HeapBinComparator());
+             for (Map.Entry<Integer, Float> entry : magnitudeCurrentPeaks.entrySet()) {
+-                magnitudeHeap.add(new HeapBin(entry.getKey(), -1, (float) magnitudeLast[entry.getKey()], 0));
++                magnitudeHeap.add(new HeapBin(entry.getKey(), -1, magnitudeLast[entry.getKey()], 0));
+             }
+ 
+             for (int i = midRange.min; i < midRange.max; i++) {
+@@ -106,12 +106,12 @@
+             }
+         }
+ 
+-        phaseLast = Arrays.copyOf(ArrayUtil.floatToDouble(phaseCurrent), phaseCurrent.length);
++        phaseLast = Arrays.copyOf(phaseCurrent, phaseCurrent.length);
+         phaseDeltaLast = Arrays.copyOf(phaseDelta, phaseCurrent.length);
+-        magnitudeLast = Arrays.copyOf(ArrayUtil.floatToDouble(magnitude), magnitude.length);
++        magnitudeLast = Arrays.copyOf(magnitude, magnitude.length);
+         frameIndex++;
+ 
+-        return ArrayUtil.doubleToFloat(phaseTransformed);
++        return phaseTransformed;
+     }
+ 
+     private Map<Integer, Float> getMagnitudePeaks(float[] magnitude, float minMagnitude, MidRange midRange) {
+@@ -130,9 +130,9 @@
+         int binIndex;
+         int timeIndex;
+         float magnitude;
+-        double phaseRotation;
++        float phaseRotation;
+ 
+-        public HeapBin(int binIndex, int timeIndex, float magnitude, double phaseRotation) {
++        public HeapBin(int binIndex, int timeIndex, float magnitude, float phaseRotation) {
+             this.binIndex = binIndex;
+             this.timeIndex = timeIndex;
+             this.magnitude = magnitude;
+Index: app/src/main/java/ch/zhaw/ch/util/DSPUtil.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ch.zhaw.ch.util;\r\n\r\npublic class DSPUtil {\r\n    public final static double PI = Math.PI;\r\n\r\n    public static double princarg(double phase) {\r\n        return phase - 2 * PI * Math.round(phase/(2*PI));\r\n    }\r\n\r\n    public static float princarg(float phase){\r\n        return (float) princarg((double) phase);\r\n    }\r\n\r\n    public static void princarg(float[] phase) {\r\n        for (int i = 0; i < phase.length; i++) {\r\n            phase[i] = (float) princarg(phase[i]);\r\n        }\r\n    }\r\n\r\n    public static void princarg(double[] phase) {\r\n        for (int i = 0; i < phase.length; i++) {\r\n            phase[i] = princarg(phase[i]);\r\n        }\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/ch/zhaw/ch/util/DSPUtil.java	(revision 4fe02a4754e1a535bb70c0e32191f2454538984c)
++++ app/src/main/java/ch/zhaw/ch/util/DSPUtil.java	(date 1623364526583)
+@@ -1,14 +1,10 @@
+ package ch.zhaw.ch.util;
+ 
+ public class DSPUtil {
+-    public final static double PI = Math.PI;
+-
+-    public static double princarg(double phase) {
+-        return phase - 2 * PI * Math.round(phase/(2*PI));
+-    }
++    public final static float PI = (float) Math.PI;
+ 
+-    public static float princarg(float phase){
+-        return (float) princarg((double) phase);
++    public static float princarg(float phase) {
++        return phase - 2 * PI * Math.round(phase/(2*PI));
+     }
+ 
+     public static void princarg(float[] phase) {
+@@ -16,10 +12,4 @@
+             phase[i] = (float) princarg(phase[i]);
+         }
+     }
+-
+-    public static void princarg(double[] phase) {
+-        for (int i = 0; i < phase.length; i++) {
+-            phase[i] = princarg(phase[i]);
+-        }
+-    }
+ }
+Index: app/src/main/java/ch/zhaw/ch/dsp/phase/ScaledPhaseLockedShifter.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ch.zhaw.ch.dsp.phase;\r\n\r\nimport java.util.ArrayList;\r\nimport java.util.Arrays;\r\n\r\nimport ch.zhaw.ch.dsp.ComplexFrame;\r\nimport ch.zhaw.ch.dsp.TransientDetection;\r\nimport ch.zhaw.ch.dsp.TransientDetectionType;\r\nimport ch.zhaw.ch.util.ArrayUtil;\r\nimport ch.zhaw.ch.util.DSPUtil;\r\n\r\npublic class ScaledPhaseLockedShifter extends PhaseReseter implements PhaseShifter {\r\n    private final String TAG =  ScaledPhaseLockedShifter.class.getSimpleName();\r\n\r\n    private double[] expectedPhaseDelta;\r\n    private double[] lastPhase;\r\n    private ArrayList<Integer> lastMagnitudePeaks;\r\n    private int shadowPeak = 1;\r\n    private int frameIndex = 0;\r\n    private int frameSize;\r\n    private int hopSizeAnalysis;\r\n    private float stretchFactor;\r\n    private int lowerBoundIndexPosition = 0;\r\n    private int upperBoundIndexPosition = 1;\r\n    private int scaleFactor = 1;\r\n\r\n    @Override\r\n    public void init(int frameSize, int frameSizeNyquist, int hopSizeAnalysis, float stretchFactor, int sampleRate, TransientDetection transientDetection, PhaseResetType phaseResetType) {\r\n        this.frameSize = frameSize;\r\n        this.frameSizeNyquist = frameSizeNyquist;\r\n        this.hopSizeAnalysis = hopSizeAnalysis;\r\n        this.stretchFactor = stretchFactor;\r\n\r\n\r\n        expectedPhaseDelta= ArrayUtil.div(ArrayUtil.mul(ArrayUtil.range(frameSizeNyquist), (double) (2.0 * Math.PI * hopSizeAnalysis)), (float) frameSize);\r\n        lastPhase = ArrayUtil.rangeOfValue(frameSizeNyquist, 0d);\r\n        phaseTransformed = ArrayUtil.rangeOfValue(frameSizeNyquist, 0d);\r\n        lastMagnitudePeaks = new ArrayList<>();\r\n\r\n        setup(frameSize, sampleRate);\r\n        setPhaseResetType(phaseResetType);\r\n        this.transientDetection = transientDetection;\r\n    }\r\n\r\n    @Override\r\n    public float[] shift(ComplexFrame frame) {\r\n        double[] currentPhase = ArrayUtil.floatToDouble(frame.getPhase());\r\n        double[] currentMagnitude = ArrayUtil.floatToDouble(frame.getMagnitude());\r\n        double[] phaseTransformedTemp;\r\n        ArrayList<Integer> currentMagnitudePeaks = getMagnitudePeaks(currentMagnitude);\r\n        MidRange midRange = defaultMidRange;\r\n\r\n        boolean transientDetected = transientDetection.getTransientMode() != TransientDetectionType.NONE && transientDetection.detectTransients(frame.getMagnitude());\r\n\r\n        if(transientDetected)\r\n            midRange = resetPhase(ArrayUtil.doubleToFloat(currentPhase));\r\n\r\n        if (!transientDetected || phaseResetType == PhaseResetType.BAND_LIMITED) {\r\n            if (currentMagnitudePeaks.size() > 0 && lastMagnitudePeaks.size() > 0) {\r\n                phaseTransformedTemp = magnitudePeakTransformation(currentPhase, currentMagnitude, currentMagnitudePeaks);\r\n                for(int i = midRange.min; i < midRange.max; i++) {\r\n                    phaseTransformed[i] = phaseTransformedTemp[i];\r\n                }\r\n                //phaseTransformed = phaseTransformedTemp;\r\n            } else {\r\n                normalCalculation(currentPhase, midRange);\r\n            }\r\n        }\r\n\r\n        lastPhase = Arrays.copyOf(currentPhase, currentPhase.length);\r\n        lastMagnitudePeaks = new ArrayList<>(currentMagnitudePeaks);\r\n        frameIndex++;\r\n\r\n        return ArrayUtil.doubleToFloat(phaseTransformed);\r\n    }\r\n\r\n    private double[] magnitudePeakTransformation(double[] currentPhase, double[] currentMagnitude, ArrayList<Integer> currentMagnitudePeaks){\r\n        double[] phaseTransformedTemp = new double[frameSizeNyquist];\r\n        int previousPeakPosition = 0;\r\n        int currentPeakIndex;\r\n        int upperBoundIndex = 0;\r\n        int lowerBoundIndex = 0;\r\n        for (int currentPeakPosition = 0; currentPeakPosition < currentMagnitudePeaks.size(); currentPeakPosition++) {\r\n            currentPeakIndex = currentMagnitudePeaks.get(currentPeakPosition);\r\n            previousPeakPosition = getRelatedPeak(previousPeakPosition, currentPeakIndex);\r\n            double[] values = getPhaseRotation(currentPhase, lastMagnitudePeaks.get(previousPeakPosition), currentPeakIndex);\r\n            double peakSynthesisPhase = values[0];\r\n            double peakPhaseUnwrapped = values[1];\r\n            lowerBoundIndex = upperBoundIndex;\r\n            upperBoundIndex = getUpperInfluenceBounds(currentMagnitudePeaks, currentMagnitude, currentPeakIndex);\r\n            for(int i = lowerBoundIndex; i <= upperBoundIndex; i++){\r\n                double unwrappedPhase = this.lastPhase[i] + expectedPhaseDelta[i] + DSPUtil.princarg(currentPhase[i] - lastPhase[i] - expectedPhaseDelta[i]);\r\n                phaseTransformedTemp[i] = peakSynthesisPhase + scaleFactor * (unwrappedPhase - peakPhaseUnwrapped);\r\n            }\r\n        }\r\n\r\n        return phaseTransformedTemp;\r\n    }\r\n\r\n    private int getUpperInfluenceBounds(ArrayList<Integer> currentMagnitudePeaks, double[] magnitude, int currentPeakIndex) {\r\n        if(currentMagnitudePeaks.size() <= 1 || currentPeakIndex == currentMagnitudePeaks.get(currentMagnitudePeaks.size()-1)){\r\n            return frameSizeNyquist-1;\r\n        }\r\n        int upperBoundIndex = currentPeakIndex;\r\n        while(upperBoundIndex < this.frameSizeNyquist-1 && magnitude[upperBoundIndex] > magnitude[upperBoundIndex+1]) upperBoundIndex++;\r\n        return upperBoundIndex;\r\n    }\r\n\r\n    private double[] getPhaseRotation(double[] currentPhase, int lastPeakIndex, int currentPeakIndex) {\r\n        double averagePeakIndex = (currentPeakIndex + lastPeakIndex) /2.0;\r\n        double expectedPeakPhaseDelta = 2 * Math.PI * hopSizeAnalysis * averagePeakIndex / frameSize;\r\n        double peakPhaseDelta = expectedPeakPhaseDelta + DSPUtil.princarg(currentPhase[currentPeakIndex] - lastPhase[lastPeakIndex] -expectedPeakPhaseDelta);\r\n        double peakPhaseUnwrapped = lastPhase[currentPeakIndex] + peakPhaseDelta;\r\n        return new double[]{DSPUtil.princarg(phaseTransformed[currentPeakIndex] + peakPhaseDelta * stretchFactor), peakPhaseUnwrapped};\r\n    }\r\n\r\n    private int getRelatedPeak(int previousPeakPosition, int currentPeakIndex){\r\n        while(previousPeakPosition < (lastMagnitudePeaks.size()-1) &&\r\n                Math.abs(currentPeakIndex - lastMagnitudePeaks.get(previousPeakPosition+1)) <\r\n                Math.abs(currentPeakIndex - lastMagnitudePeaks.get(previousPeakPosition))){\r\n            previousPeakPosition++;\r\n        }\r\n\r\n        return previousPeakPosition;\r\n    }\r\n\r\n    private void normalCalculation(double[] currentPhase, MidRange midRange) {\r\n        double deltaPhase;\r\n        for(int i = midRange.min; i < midRange.max; i++){\r\n            deltaPhase = expectedPhaseDelta[i] + DSPUtil.princarg(currentPhase[i] - lastPhase[i] - expectedPhaseDelta[i]);\r\n            phaseTransformed[i] = DSPUtil.princarg(phaseTransformed[i] + deltaPhase * stretchFactor);\r\n        }\r\n    }\r\n\r\n    private ArrayList<Integer> getMagnitudePeaks(double[] magnitude){\r\n        ArrayList<Integer> currentMagnitudePeaks = new ArrayList<>();\r\n        boolean isPeak;\r\n        for (int i = shadowPeak; i < (frameSizeNyquist - shadowPeak); i++){\r\n            if(magnitude[i] < 1) continue;\r\n            isPeak = true;\r\n            for(int j = (-shadowPeak); j <= shadowPeak; j++){\r\n                if(magnitude[i] < magnitude[i+j]){\r\n                    isPeak = false;\r\n                    break;\r\n                }\r\n            }\r\n            if(isPeak){\r\n                currentMagnitudePeaks.add(i);\r\n                i+= shadowPeak;\r\n            }\r\n        }\r\n        return currentMagnitudePeaks;\r\n    }\r\n\r\n\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/ch/zhaw/ch/dsp/phase/ScaledPhaseLockedShifter.java	(revision 4fe02a4754e1a535bb70c0e32191f2454538984c)
++++ app/src/main/java/ch/zhaw/ch/dsp/phase/ScaledPhaseLockedShifter.java	(date 1623366232501)
+@@ -10,10 +10,10 @@
+ import ch.zhaw.ch.util.DSPUtil;
+ 
+ public class ScaledPhaseLockedShifter extends PhaseReseter implements PhaseShifter {
+-    private final String TAG =  ScaledPhaseLockedShifter.class.getSimpleName();
++    private final String TAG = ScaledPhaseLockedShifter.class.getSimpleName();
+ 
+-    private double[] expectedPhaseDelta;
+-    private double[] lastPhase;
++    private float[] expectedPhaseDelta;
++    private float[] lastPhase;
+     private ArrayList<Integer> lastMagnitudePeaks;
+     private int shadowPeak = 1;
+     private int frameIndex = 0;
+@@ -31,10 +31,9 @@
+         this.hopSizeAnalysis = hopSizeAnalysis;
+         this.stretchFactor = stretchFactor;
+ 
+-
+-        expectedPhaseDelta= ArrayUtil.div(ArrayUtil.mul(ArrayUtil.range(frameSizeNyquist), (double) (2.0 * Math.PI * hopSizeAnalysis)), (float) frameSize);
+-        lastPhase = ArrayUtil.rangeOfValue(frameSizeNyquist, 0d);
+-        phaseTransformed = ArrayUtil.rangeOfValue(frameSizeNyquist, 0d);
++        expectedPhaseDelta = ArrayUtil.div(ArrayUtil.mul(ArrayUtil.range(frameSizeNyquist), (2f * DSPUtil.PI * hopSizeAnalysis)), (float) frameSize);
++        lastPhase = ArrayUtil.rangeOfValue(frameSizeNyquist, 0f);
++        phaseTransformed = ArrayUtil.rangeOfValue(frameSizeNyquist, 0f);
+         lastMagnitudePeaks = new ArrayList<>();
+ 
+         setup(frameSize, sampleRate);
+@@ -44,24 +43,23 @@
+ 
+     @Override
+     public float[] shift(ComplexFrame frame) {
+-        double[] currentPhase = ArrayUtil.floatToDouble(frame.getPhase());
+-        double[] currentMagnitude = ArrayUtil.floatToDouble(frame.getMagnitude());
+-        double[] phaseTransformedTemp;
++        float[] currentPhase = frame.getPhase();
++        float[] currentMagnitude = frame.getMagnitude();
++        float[] phaseTransformedTemp;
+         ArrayList<Integer> currentMagnitudePeaks = getMagnitudePeaks(currentMagnitude);
+         MidRange midRange = defaultMidRange;
+ 
+         boolean transientDetected = transientDetection.getTransientMode() != TransientDetectionType.NONE && transientDetection.detectTransients(frame.getMagnitude());
+ 
+-        if(transientDetected)
+-            midRange = resetPhase(ArrayUtil.doubleToFloat(currentPhase));
++        if (transientDetected)
++            midRange = resetPhase(currentPhase);
+ 
+         if (!transientDetected || phaseResetType == PhaseResetType.BAND_LIMITED) {
+             if (currentMagnitudePeaks.size() > 0 && lastMagnitudePeaks.size() > 0) {
+-                phaseTransformedTemp = magnitudePeakTransformation(currentPhase, currentMagnitude, currentMagnitudePeaks);
+-                for(int i = midRange.min; i < midRange.max; i++) {
++                phaseTransformedTemp = magnitudePeakTransformation(currentPhase, currentMagnitude, currentMagnitudePeaks, transientDetected);
++                for (int i = midRange.min; i < midRange.max; i++) {
+                     phaseTransformed[i] = phaseTransformedTemp[i];
+                 }
+-                //phaseTransformed = phaseTransformedTemp;
+             } else {
+                 normalCalculation(currentPhase, midRange);
+             }
+@@ -71,11 +69,11 @@
+         lastMagnitudePeaks = new ArrayList<>(currentMagnitudePeaks);
+         frameIndex++;
+ 
+-        return ArrayUtil.doubleToFloat(phaseTransformed);
++        return phaseTransformed;
+     }
+ 
+-    private double[] magnitudePeakTransformation(double[] currentPhase, double[] currentMagnitude, ArrayList<Integer> currentMagnitudePeaks){
+-        double[] phaseTransformedTemp = new double[frameSizeNyquist];
++    private float[] magnitudePeakTransformation(float[] currentPhase, float[] currentMagnitude, ArrayList<Integer> currentMagnitudePeaks, boolean transientDetected) {
++        float[] phaseTransformedTemp = new float[frameSizeNyquist];
+         int previousPeakPosition = 0;
+         int currentPeakIndex;
+         int upperBoundIndex = 0;
+@@ -83,13 +81,14 @@
+         for (int currentPeakPosition = 0; currentPeakPosition < currentMagnitudePeaks.size(); currentPeakPosition++) {
+             currentPeakIndex = currentMagnitudePeaks.get(currentPeakPosition);
+             previousPeakPosition = getRelatedPeak(previousPeakPosition, currentPeakIndex);
+-            double[] values = getPhaseRotation(currentPhase, lastMagnitudePeaks.get(previousPeakPosition), currentPeakIndex);
+-            double peakSynthesisPhase = values[0];
+-            double peakPhaseUnwrapped = values[1];
++            if (transientDetected && phaseResetType == PhaseResetType.BAND_LIMITED && (currentPeakIndex < bandLow || currentPeakIndex >= bandHigh)) continue;
++            float[] values = getPhaseRotation(currentPhase, lastMagnitudePeaks.get(previousPeakPosition), currentPeakIndex);
++            float peakSynthesisPhase = values[0];
++            float peakPhaseUnwrapped = values[1];
+             lowerBoundIndex = upperBoundIndex;
+             upperBoundIndex = getUpperInfluenceBounds(currentMagnitudePeaks, currentMagnitude, currentPeakIndex);
+-            for(int i = lowerBoundIndex; i <= upperBoundIndex; i++){
+-                double unwrappedPhase = this.lastPhase[i] + expectedPhaseDelta[i] + DSPUtil.princarg(currentPhase[i] - lastPhase[i] - expectedPhaseDelta[i]);
++            for (int i = lowerBoundIndex; i <= upperBoundIndex; i++) {
++                float unwrappedPhase = this.lastPhase[i] + expectedPhaseDelta[i] + DSPUtil.princarg(currentPhase[i] - lastPhase[i] - expectedPhaseDelta[i]);
+                 phaseTransformedTemp[i] = peakSynthesisPhase + scaleFactor * (unwrappedPhase - peakPhaseUnwrapped);
+             }
+         }
+@@ -97,56 +96,55 @@
+         return phaseTransformedTemp;
+     }
+ 
+-    private int getUpperInfluenceBounds(ArrayList<Integer> currentMagnitudePeaks, double[] magnitude, int currentPeakIndex) {
+-        if(currentMagnitudePeaks.size() <= 1 || currentPeakIndex == currentMagnitudePeaks.get(currentMagnitudePeaks.size()-1)){
+-            return frameSizeNyquist-1;
++    private int getUpperInfluenceBounds(ArrayList<Integer> currentMagnitudePeaks, float[] magnitude, int currentPeakIndex) {
++        if (currentMagnitudePeaks.size() <= 1 || currentPeakIndex == currentMagnitudePeaks.get(currentMagnitudePeaks.size() - 1)) {
++            return frameSizeNyquist - 1;
+         }
+         int upperBoundIndex = currentPeakIndex;
+-        while(upperBoundIndex < this.frameSizeNyquist-1 && magnitude[upperBoundIndex] > magnitude[upperBoundIndex+1]) upperBoundIndex++;
++        while (upperBoundIndex < this.frameSizeNyquist - 1 && magnitude[upperBoundIndex] > magnitude[upperBoundIndex + 1]) upperBoundIndex++;
+         return upperBoundIndex;
+     }
+ 
+-    private double[] getPhaseRotation(double[] currentPhase, int lastPeakIndex, int currentPeakIndex) {
+-        double averagePeakIndex = (currentPeakIndex + lastPeakIndex) /2.0;
+-        double expectedPeakPhaseDelta = 2 * Math.PI * hopSizeAnalysis * averagePeakIndex / frameSize;
+-        double peakPhaseDelta = expectedPeakPhaseDelta + DSPUtil.princarg(currentPhase[currentPeakIndex] - lastPhase[lastPeakIndex] -expectedPeakPhaseDelta);
+-        double peakPhaseUnwrapped = lastPhase[currentPeakIndex] + peakPhaseDelta;
+-        return new double[]{DSPUtil.princarg(phaseTransformed[currentPeakIndex] + peakPhaseDelta * stretchFactor), peakPhaseUnwrapped};
++    private float[] getPhaseRotation(float[] currentPhase, int lastPeakIndex, int currentPeakIndex) {
++        float averagePeakIndex = (currentPeakIndex + lastPeakIndex) / 2f;
++        float expectedPeakPhaseDelta = 2f * DSPUtil.PI * hopSizeAnalysis * averagePeakIndex / frameSize;
++        float peakPhaseDelta = expectedPeakPhaseDelta + DSPUtil.princarg(currentPhase[currentPeakIndex] - lastPhase[lastPeakIndex] - expectedPeakPhaseDelta);
++        float peakPhaseUnwrapped = lastPhase[currentPeakIndex] + peakPhaseDelta;
++        return new float[]{DSPUtil.princarg(phaseTransformed[currentPeakIndex] + peakPhaseDelta * stretchFactor), peakPhaseUnwrapped};
+     }
+ 
+-    private int getRelatedPeak(int previousPeakPosition, int currentPeakIndex){
+-        while(previousPeakPosition < (lastMagnitudePeaks.size()-1) &&
+-                Math.abs(currentPeakIndex - lastMagnitudePeaks.get(previousPeakPosition+1)) <
+-                Math.abs(currentPeakIndex - lastMagnitudePeaks.get(previousPeakPosition))){
++    private int getRelatedPeak(int previousPeakPosition, int currentPeakIndex) {
++        while (previousPeakPosition < (lastMagnitudePeaks.size() - 1) &&
++                Math.abs(currentPeakIndex - lastMagnitudePeaks.get(previousPeakPosition + 1)) <
++                        Math.abs(currentPeakIndex - lastMagnitudePeaks.get(previousPeakPosition))) {
+             previousPeakPosition++;
+         }
+-
+         return previousPeakPosition;
+     }
+ 
+-    private void normalCalculation(double[] currentPhase, MidRange midRange) {
+-        double deltaPhase;
+-        for(int i = midRange.min; i < midRange.max; i++){
++    private void normalCalculation(float[] currentPhase, MidRange midRange) {
++        float deltaPhase;
++        for (int i = midRange.min; i < midRange.max; i++) {
+             deltaPhase = expectedPhaseDelta[i] + DSPUtil.princarg(currentPhase[i] - lastPhase[i] - expectedPhaseDelta[i]);
+-            phaseTransformed[i] = DSPUtil.princarg(phaseTransformed[i] + deltaPhase * stretchFactor);
++            phaseTransformed[i] = phaseTransformed[i] + deltaPhase * stretchFactor;
+         }
+     }
+ 
+-    private ArrayList<Integer> getMagnitudePeaks(double[] magnitude){
++    private ArrayList<Integer> getMagnitudePeaks(float[] magnitude) {
+         ArrayList<Integer> currentMagnitudePeaks = new ArrayList<>();
+         boolean isPeak;
+-        for (int i = shadowPeak; i < (frameSizeNyquist - shadowPeak); i++){
+-            if(magnitude[i] < 1) continue;
++        for (int i = shadowPeak; i < (frameSizeNyquist - shadowPeak); i++) {
++            if (magnitude[i] < 1) continue;
+             isPeak = true;
+-            for(int j = (-shadowPeak); j <= shadowPeak; j++){
+-                if(magnitude[i] < magnitude[i+j]){
++            for (int j = (-shadowPeak); j <= shadowPeak; j++) {
++                if (magnitude[i] < magnitude[i + j]) {
+                     isPeak = false;
+                     break;
+                 }
+             }
+-            if(isPeak){
++            if (isPeak) {
+                 currentMagnitudePeaks.add(i);
+-                i+= shadowPeak;
++                i += shadowPeak;
+             }
+         }
+         return currentMagnitudePeaks;

@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Gradle: com.jtransc:jtransc-rt:0.6.8">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jtransc/jtransc-rt/0.6.8/64f8473768fefdf893618f5637250a271e8d95c9/jtransc-rt-0.6.8.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jtransc/jtransc-rt/0.6.8/8887f43d8c636c52b5e082f01bcd063d3593edb4/jtransc-rt-0.6.8-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.jtransc/jtransc-rt/0.6.8/4842d1f0f7074d432515e1b6d26995f969cfae75/jtransc-rt-0.6.8-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

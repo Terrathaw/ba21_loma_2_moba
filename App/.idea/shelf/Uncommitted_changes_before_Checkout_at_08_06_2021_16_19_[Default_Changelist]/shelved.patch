@@ -1,0 +1,35 @@
+Index: app/src/main/java/ch/zhaw/ch/dsp/TransientDetection.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ch.zhaw.ch.dsp;\r\n\r\nimport ch.zhaw.ch.util.MovingMedian;\r\n\r\npublic class TransientDetection {\r\n    private float[] lastMagnitude;\r\n    private float lastHighFreq;\r\n    private TransientDetectionType transientMode = TransientDetectionType.NONE;\r\n    private MovingMedian highFreqFilter;\r\n    private MovingMedian highFreqDerivFilter;\r\n    private float lastResult;\r\n    private int risingCount;\r\n    private float previdousDf;\r\n    private float transientThrehhold = 0.35f;\r\n\r\n    public TransientDetection(TransientDetectionType transientMode){\r\n        this.transientMode = transientMode;\r\n        highFreqFilter = new MovingMedian(19, 85);\r\n        highFreqDerivFilter = new MovingMedian(19, 90);\r\n    }\r\n\r\n    public boolean detectTransients(float[] currentMagnitude){\r\n        float df = getTransients(currentMagnitude);\r\n        if(df > 0){\r\n            previdousDf = df;\r\n            if(df > previdousDf && df > transientThrehhold){\r\n                return true;\r\n            }\r\n        }\r\n\r\n        return false;\r\n    }\r\n\r\n    public TransientDetectionType getTransientMode(){\r\n        return transientMode;\r\n    }\r\n\r\n    private float highFreqDetection(float[] currentMagnitude){\r\n        float result  = 0.0f;\r\n        for (int i = 0; i <= currentMagnitude.length; i++) {\r\n            result +=  currentMagnitude[i]*i;\r\n        }\r\n        return result;\r\n    }\r\n\r\n    private float percussiveDetection(float[] currentMagnitude){\r\n        float threshold = (float) Math.pow(10.0, 0.15);\r\n        float zeroThresh = (float) Math.pow(10.0, -8);\r\n        int count = 0;\r\n        int nonZeroCount = 0;\r\n        float magnitudeIncrease;\r\n\r\n        for(int i = 0; i <= currentMagnitude.length; i++){\r\n            magnitudeIncrease = 0.0f;\r\n            if(lastMagnitude[i] > zeroThresh)\r\n                magnitudeIncrease = currentMagnitude[i]/lastMagnitude[i];\r\n            else if(currentMagnitude[i] > zeroThresh)\r\n                magnitudeIncrease = threshold;\r\n            if(magnitudeIncrease >= threshold)\r\n                count +=1;\r\n            if(currentMagnitude[i] > zeroThresh)\r\n                nonZeroCount +=1;\r\n        }\r\n        lastMagnitude = currentMagnitude;\r\n        if(nonZeroCount == 0)\r\n            return 0f;\r\n        return count/nonZeroCount;\r\n    }\r\n\r\n    private float getTransients(float[] currentMagnitude) {\r\n        float percussive = 0.0f;\r\n        float highFreq = 0.0f;\r\n        if (transientMode == TransientDetectionType.PERCUSSIVE){\r\n            percussive = percussiveDetection(currentMagnitude);\r\n        }else if(transientMode == TransientDetectionType.COMPOUND){\r\n            percussive = percussiveDetection(currentMagnitude);\r\n            highFreq = highFreqDetection(currentMagnitude);\r\n        }else if(transientMode == TransientDetectionType.HIGH_FREQ){\r\n            highFreq = highFreqDetection(currentMagnitude);\r\n        }\r\n        return processTransient(percussive, highFreq);\r\n    }\r\n\r\n    private float processTransient(float percussive, float highFreq) {\r\n        if(transientMode == TransientDetectionType.PERCUSSIVE)\r\n            return percussive;\r\n\r\n        float transientProbability = 0.0f;\r\n        float highFreqDeriv = highFreq - lastHighFreq;\r\n        float result = 0f;\r\n\r\n        highFreqFilter.Put(highFreq);\r\n        highFreqDerivFilter.Put(highFreqDeriv);\r\n        this.lastHighFreq = highFreq;\r\n\r\n        float highFreqExcess = highFreq - highFreqFilter.Get();\r\n        if(highFreqExcess > 0)\r\n            result = highFreqDeriv - highFreqDerivFilter.Get();\r\n\r\n        if(result < this.lastResult){\r\n            if(risingCount > 3 && lastResult > 0)\r\n                transientProbability = 0.5f;\r\n            risingCount = 0;\r\n        }else{\r\n            risingCount++;\r\n        }\r\n\r\n        if(transientMode == TransientDetectionType.COMPOUND){\r\n            if(percussive > 0.35f && percussive > transientProbability){\r\n                transientProbability = percussive;\r\n            }\r\n        }\r\n\r\n        this.lastResult = result;\r\n        return transientProbability;\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/ch/zhaw/ch/dsp/TransientDetection.java	(revision 17d6d335984015f0a08652a7b7b43c7560fbae03)
++++ app/src/main/java/ch/zhaw/ch/dsp/TransientDetection.java	(date 1622729115261)
+@@ -21,13 +21,11 @@
+ 
+     public boolean detectTransients(float[] currentMagnitude){
+         float df = getTransients(currentMagnitude);
+-        if(df > 0){
++        if(df > 0 && df > previdousDf && df > transientThrehhold){
+             previdousDf = df;
+-            if(df > previdousDf && df > transientThrehhold){
+-                return true;
+-            }
++            return true;
+         }
+-
++        previdousDf = df;
+         return false;
+     }
+ 
+@@ -45,7 +43,7 @@
+ 
+     private float percussiveDetection(float[] currentMagnitude){
+         float threshold = (float) Math.pow(10.0, 0.15);
+-        float zeroThresh = (float) Math.pow(10.0, -8);
++        float zeroThresh = (float) 10e-8;
+         int count = 0;
+         int nonZeroCount = 0;
+         float magnitudeIncrease;
